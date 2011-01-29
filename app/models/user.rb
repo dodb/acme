@@ -1,5 +1,5 @@
 # == Schema Information
-# Schema version: 20110127102140
+# Schema version: 20110111015426
 #
 # Table name: users
 #
@@ -9,14 +9,20 @@
 #  created_at :datetime
 #  updated_at :datetime
 #
+require 'digest'
 
 class User < ActiveRecord::Base
+  
+  email_regex = /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i
+  
+  cattr_reader :per_page
+  @@per_page = 10
+
   attr_accessor :password
   attr_accessible :name, :email, :password, :password_confirmation
-  email_regex = /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i
-
-  validates :name,  :presence => true,
-                    :length => { :maximum => 50 }
+  
+  validates :name, :presence => true,
+                   :length => { :maximum => 50 }
   validates :email, :presence => true,
                     :format => { :with => email_regex },
                     :uniqueness => { :case_sensitive => false }
@@ -25,9 +31,8 @@ class User < ActiveRecord::Base
                        :confirmation => true,
                        :length       => { :within => 6..40 }
 
-  before_save :encrypt_password
+   before_save :encrypt_password
 
-  # Return true if the user's password matches the submitted password.
   def has_password?(submitted_password)
     encrypted_password == encrypt(submitted_password)
   end
@@ -37,12 +42,11 @@ class User < ActiveRecord::Base
     return nil  if user.nil?
     return user if user.has_password?(submitted_password)
   end
-
+  
   def self.authenticate_with_salt(id, cookie_salt)
     user = find_by_id(id)
     (user && user.salt == cookie_salt) ? user : nil
   end
-
 
   private
 
@@ -62,5 +66,5 @@ class User < ActiveRecord::Base
     def secure_hash(string)
       Digest::SHA2.hexdigest(string)
     end
-
 end
+

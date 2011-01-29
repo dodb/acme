@@ -53,12 +53,15 @@ describe SessionsController do
         controller.should be_signed_in
       end
 
+
       it "should redirect to the user show page" do
         post :create, :session => @attr
         response.should redirect_to(user_path(@user))
       end
     end
 
+  end
+  
   describe "DELETE 'destroy'" do
 
     it "should sign a user out" do
@@ -69,7 +72,4 @@ describe SessionsController do
     end
   end
 
-  end
-
 end
-
