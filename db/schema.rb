@@ -19,7 +19,7 @@ ActiveRecord::Schema.define(:version => 20110129111244) do
     t.datetime "updated_at"
     t.string   "encrypted_password"
     t.string   "salt"
-    t.boolean  "admin"
+    t.boolean  "admin",              :default => false
   end
 
 end
